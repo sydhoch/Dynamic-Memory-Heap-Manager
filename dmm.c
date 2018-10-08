@@ -3,10 +3,6 @@
 #include <assert.h> // needed for asserts
 #include "dmm.h"
 
-/* You can improve the below metadata structure using the concepts from Bryant
- * and OHallaron book (chapter 9).
- */
-
 typedef struct metadata {
   /* size_t is the return type of the sizeof operator. Since the size of an
    * object depends on the architecture and its implementation, size_t is used
@@ -34,7 +30,6 @@ void* dmalloc(size_t numbytes) {
   assert(numbytes > 0);
   size_t anumbytes = ALIGN(numbytes);
 
-  /* your code here */
   metadata_t *temp = freelist;
   //print_freelist();
   while(temp!=NULL){
@@ -74,7 +69,6 @@ void* dmalloc(size_t numbytes) {
       }
       else if (original_prev == NULL){
         original_next->prev = NULL;
-        //freelist = freelist->next;
         freelist = original_next;
       }
       else if (original_next == NULL){
@@ -98,7 +92,6 @@ void* dmalloc(size_t numbytes) {
 }
 
 void dfree(void* ptr) {
-  /* your code here */
   //if ptr == NULL, no operation is performed
   if (ptr == NULL){
     return;
@@ -106,7 +99,6 @@ void dfree(void* ptr) {
   metadata_t *rp = ptr - METADATA_T_ALIGNED;
   metadata_t *temp = freelist;
   
-  //print_freelist();
   while (temp != NULL){
     //if temp is only block
     if (temp->next == NULL && temp->prev == NULL){
@@ -187,20 +179,12 @@ void dfree(void* ptr) {
 
 bool dmalloc_init() {
 
-  /* Two choices: 
-   * 1. Append prologue and epilogue blocks to the start and the
-   * end of the freelist 
-   *
-   * 2. Initialize freelist pointers to NULL
-   *
-   * Note: We provide the code for 2. Using 1 will help you to tackle the 
-   * corner cases succinctly.
+  /*  Initialize freelist pointers to NULL
    */
 
   size_t max_bytes = ALIGN(MAX_HEAP_SIZE);
   /* returns heap_region, which is initialized to freelist */
   freelist = (metadata_t*) mmap(NULL, max_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  /* Q: Why casting is used? i.e., why (void*)-1? */
   if (freelist == (void *)-1)
     return false;
   freelist->next = NULL;
@@ -209,7 +193,6 @@ bool dmalloc_init() {
   return true;
 }
 
-/* for debugging; can be turned off through -NDEBUG flag*/
 void print_freelist() {
   metadata_t *freelist_head = freelist;
   while(freelist_head != NULL) {
